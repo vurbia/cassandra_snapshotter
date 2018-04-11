@@ -60,11 +60,14 @@ def add_s3_arguments(arg_parser):
                             required=True,
                             help="S3 base path for backups.")
 
+    arg_parser.add_argument('--s3-endpoint',
+                            help="S3 API endpoint for non AWS S3 compatible implementations.")
+
     return arg_parser
 
 
-def get_s3_connection_host(s3_bucket_region):
-    return S3_CONNECTION_HOSTS[s3_bucket_region]
+def get_s3_connection_host(s3_endpoint, s3_bucket_region):
+    return s3_endpoint or S3_CONNECTION_HOSTS[s3_bucket_region]
 
 
 def map_wrap(f):
