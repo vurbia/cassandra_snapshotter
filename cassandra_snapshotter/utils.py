@@ -79,8 +79,8 @@ def add_s3_arguments(arg_parser):
     return arg_parser
 
 
-def get_s3_connection_host(s3_endpoint, s3_bucket_region):
-    return s3_endpoint or S3_CONNECTION_HOSTS[s3_bucket_region]
+def get_s3_connection_host(s3_bucket_region):
+    return S3_CONNECTION_HOSTS[s3_bucket_region]
 
 
 def map_wrap(f):
