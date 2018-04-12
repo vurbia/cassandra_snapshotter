@@ -377,9 +377,9 @@ class BackupWorker(object):
         with settings(host_string=env.hosts[0]):
             with hide('output'):
                 if self.use_sudo:
-                    ring_description = sudo(self.nodetool_path + ' ring')
+                    ring_description = sudo(self.nodetool_invocation() + ' ring')
                 else:
-                    ring_description = run(self.nodetool_path + ' ring')
+                    ring_description = run(self.nodetool_invocation() + ' ring')
         return ring_description
 
     def get_keyspace_schema(self, keyspace=None):
