@@ -22,7 +22,23 @@ S3_CONNECTION_HOSTS = {
     'ap-northeast-1': 's3-ap-northeast-1.amazonaws.com',
     'ap-south-1': 's3.ap-south-1.amazonaws.com',
     'sa-east-1': 's3-sa-east-1.amazonaws.com',
-    'cn-north-1': 's3.cn-north-1.amazonaws.com.cn'
+    'cn-north-1': 's3.cn-north-1.amazonaws.com.cn',
+
+    # IBM public S3 endpoints
+    'ibm-us-geo-public': 's3-api.us-geo.objectstorage.softlayer.net',
+    'ibm-eu-geo-public': 's3.eu-geo.objectstorage.softlayer.net',
+    'ibm-ap-geo-public': 's3.ap-geo.objectstorage.softlayer.net',
+    'ibm-us-south-public': 's3.us-south.objectstorage.softlayer.net',
+    'ibm-us-east-public': 's3.us-east.objectstorage.softlayer.net',
+    'ibm-eu-gb-public': 's3.eu-gb.objectstorage.softlayer.net',
+
+    # IBM private S3 endpoints
+    'ibm-us-geo-private': 's3-api.us-geo.objectstorage.service.networklayer.com',
+    'ibm-eu-geo-private': 's3.eu-geo.objectstorage.service.networklayer.com',
+    'ibm-ap-geo-private': 's3.ap-geo.objectstorage.service.networklayer.com',
+    'ibm-us-south-private': 's3.us-south.objectstorage.service.networklayer.com',
+    'ibm-us-east-private': 's3.us-east.objectstorage.service.networklayer.com',
+    'ibm-eu-gb-private': 's3.eu-gb.objectstorage.service.networklayer.com'
 }
 
 base_parser = argparse.ArgumentParser(
@@ -59,9 +75,6 @@ def add_s3_arguments(arg_parser):
     arg_parser.add_argument('--s3-base-path',
                             required=True,
                             help="S3 base path for backups.")
-
-    arg_parser.add_argument('--s3-endpoint',
-                            help="S3 API endpoint for non AWS S3 compatible implementations.")
 
     return arg_parser
 
