@@ -64,7 +64,11 @@ def run_backup(args):
         exclude_tables=args.exclude_tables,
         reduced_redundancy=args.reduced_redundancy,
         rate_limit=args.rate_limit,
-        quiet=args.quiet
+        quiet=args.quiet,
+        nodetool_user=args.nodetool_user,
+        nodetool_pass=args.nodetool_pass,
+        nodetool_port=args.nodetool_port,
+        nodetool_password_file=args.nodetool_password_file
     )
 
     if create_snapshot:
@@ -242,6 +246,26 @@ def main():
         '--rate-limit',
         default=0,
         help="Limit the upload speed to S3 (by using 'pv'). Value expressed in kilobytes (*1024)")
+
+    backup_parser.add_argument(
+        '--nodetool-user',
+        help="Username to use for nodetool"
+    )
+
+    backup_parser.add_argument(
+        '--nodetool-pass',
+        help="Password to use for nodetool"
+    )
+
+    backup_parser.add_argument(
+        '--nodetool-password-file',
+        help="Password file to use for nodetool"
+    )
+
+    backup_parser.add_argument(
+        '--nodetool-port',
+        help="Port to use for nodetool"
+    )
 
     backup_parser.add_argument(
         '--quiet',

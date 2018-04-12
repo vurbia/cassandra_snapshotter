@@ -253,7 +253,8 @@ class BackupWorker(object):
                  s3_connection_host, cassandra_conf_path, use_sudo,
                  nodetool_path, cassandra_bin_dir, cqlsh_user, cqlsh_password,
                  backup_schema, buffer_size, exclude_tables, rate_limit, quiet,
-                 connection_pool_size=12, reduced_redundancy=False):
+                 connection_pool_size=12, reduced_redundancy=False, nodetool_user=None, nodetool_pass=None,
+                 nodetool_port=None, nodetool_password_file=None):
         self.aws_secret_access_key = aws_secret_access_key
         self.aws_access_key_id = aws_access_key_id
         self.s3_bucket_region = s3_bucket_region
@@ -261,6 +262,10 @@ class BackupWorker(object):
         self.s3_connection_host = s3_connection_host
         self.cassandra_conf_path = cassandra_conf_path
         self.nodetool_path = nodetool_path or "{!s}/nodetool".format(cassandra_bin_dir)
+        self.nodetool_user = nodetool_user
+        self.nodetool_pass = nodetool_pass
+        self.nodetool_password_file = nodetool_password_file
+        self.nodetool_port = nodetool_port
         self.cqlsh_path = "{!s}/cqlsh".format(cassandra_bin_dir)
         self.cqlsh_user = cqlsh_user
         self.cqlsh_password = cqlsh_password
@@ -451,7 +456,7 @@ class BackupWorker(object):
                 # flush can only take one keyspace at a time.
                 for keyspace in snapshot.keyspaces:
                     cmd = backup_command % dict(
-                        nodetool=self.nodetool_path,
+                        nodetool=self.nodetool_invocation(),
                         keyspace=keyspace,
                         tables=snapshot.table or ''
                     )
@@ -459,7 +464,7 @@ class BackupWorker(object):
             else:
                 # If no keyspace then can't provide a table either.
                 cmd = backup_command % dict(
-                    nodetool=self.nodetool_path,
+                    nodetool=self.nodetool_invocation(),
                     keyspace='',
                     tables=''
                 )
@@ -474,7 +479,7 @@ class BackupWorker(object):
                 table_param = "-cf {!s}".format(snapshot.table)
                 for keyspace in snapshot.keyspaces:
                     cmd = backup_command % dict(
-                        nodetool=self.nodetool_path,
+                        nodetool=self.nodetool_invocation(),
                         table_param=table_param,
                         snapshot=snapshot.name,
                         keyspaces=keyspace
@@ -482,7 +487,7 @@ class BackupWorker(object):
                     run_cmd(cmd)
             else:
                 cmd = backup_command % dict(
-                    nodetool=self.nodetool_path,
+                    nodetool=self.nodetool_invocation(),
                     table_param='',
                     snapshot=snapshot.name,
                     keyspaces=' '.join(snapshot.keyspaces or '')
@@ -503,13 +508,31 @@ class BackupWorker(object):
         """Cleans up snapshots from a cassandra node"""
         clear_command = '%(nodetool)s clearsnapshot -t "%(snapshot)s"'
         cmd = clear_command % dict(
-            nodetool=self.nodetool_path,
+            nodetool=self.nodetool_invocation(),
             snapshot=snapshot.name
         )
         if self.use_sudo:
             sudo(cmd)
         else:
             run(cmd)
+
+    def nodetool_invocation(self):
+        """Return the full path and any optional arguments to nodetool."""
+
+        # self.nodetool_path is either the user supplied path to `nodetool`
+        # or <path to cassandra_bin_dir>/nodetool`
+        full_invocation = self.nodetool_path
+
+        if self.nodetool_user:
+            full_invocation += " -u {!s}".format(self.nodetool_user)
+        if self.nodetool_pass:
+            full_invocation += " -pw {!s}".format(self.nodetool_pass)
+        if self.nodetool_password_file:
+            full_invocation += " -pwf {!s}".format(self.nodetool_password_file)
+        if self.nodetool_port:
+            full_invocation += " -p {!s}".format(self.nodetool_port)
+
+        return full_invocation
 
 
 class SnapshotCollection(object):
